@@ -2,11 +2,11 @@ const express = require('express');
 
 const Hubs = require('./hubs-model.js');
 const Messages = require('../messages/messages-model.js');
-
+const gate = require('../auth/gate-middleware')
 const router = express.Router();
 
 // this only runs if the url has /api/hubs in it
-router.get('/', async (req, res) => {
+router.get('/', gate, async (req, res) => {
   try {
     const hubs = await Hubs.find(req.query);
     res.status(200).json(hubs);
