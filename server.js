@@ -19,30 +19,7 @@ function logger(req, res, next){
   next()
 }
 
-//in class
-function urlMethod(req, res, next){
-  console.log(`${req.path}, ${req.method}`)
-}
 
-// change the gatekeeper to return a 400 if no password is provided and a message
-// that says please provide a password
-// if a password is provided and it is mellon, call next, otherwise return a 401
-// and the you shall not pass message
-function gateKeeper(req, res, next) {
-  // data can come in the body, url parameters, query string, headers
-  // new way of reading data sent by the client
-  const password = req.headers.password || '';
-
-  if(!req.headers.password){
-    res.status(400).json({message: 'no password provided'})
-  } else { next ()}
-
-  if (password.toLowerCase() === 'mellon') {
-    next();
-  } else {
-    res.status(400).json({ you: 'you shall not pass!!' });
-  }
-}
 
 // function gateKeeper(req, res, next){
 //   //data can come in body, url params, query string, header
@@ -51,6 +28,17 @@ function gateKeeper(req, res, next) {
 // }
 //put values in header, body is only available to post and put
 
+
+//add something to car/ req
+function doubler(req, res, next){
+  //everything from url is a string
+  const number = Number(req.query.number || 0)
+
+  req.doubled = number * 2
+
+  next()
+
+}
 
 server.use(logger)
 // order matters, middleware is running before express.json and routes
@@ -73,6 +61,8 @@ server.get('/paid', gate, (req, res) => {
 
 server.use('/api/hubs', hubsRouter);
 
+server.use(doubler)
+
 //function to add a name to header
 //added req.teamName
 function addName(req, res, next){
@@ -83,8 +73,8 @@ function addName(req, res, next){
   next() //so now it can go to next middleware
 
 }
-
-server.get('/', addName, (req, res) => {
+//in insomina url?number=3
+server.get('/', doubler, addname, (req, res) => {
   const nameInsert = (req.teamName) ? ` ${req.teamName}` : '';
 
   res.send(`
